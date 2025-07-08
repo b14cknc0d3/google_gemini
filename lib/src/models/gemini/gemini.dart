@@ -10,7 +10,7 @@ class GoogleGemini {
   String apiKey; // The API Key from Google
   GenerationConfig? config;
   List<SafetySettings>? safetySettings;
-  String? model = 'gemini-pro'; // The model to use, gemini-pro by default
+  String? model = 'gemini-2.0-flash'; // The model to use, gemini-pro by default
 
   GoogleGemini(
       {required this.apiKey, this.config, this.safetySettings, this.model});
@@ -20,7 +20,8 @@ class GoogleGemini {
   /// Returns a [Future<String>] with the generated text
   /// If the request fails, it returns the [Error] as a [String] instead
   ///
-  Future<GeminiResponse> generateFromText(String query) async {
+  Future<GeminiResponse> generateFromText(String query,
+      {bool isFinalGenerate = false}) async {
     String text = '';
 
     GeminiHttpResponse httpResponse = await apiGenerateText(
@@ -28,7 +29,8 @@ class GoogleGemini {
         apiKey: apiKey,
         config: config,
         safetySettings: safetySettings,
-        model: "gemini-pro");
+        model: "gemini-2.5-flash",
+        isFinalGenerate: isFinalGenerate);
 
     if (httpResponse.candidates.isNotEmpty) {
       for (var part in httpResponse.candidates[0].content!['parts']) {
@@ -39,6 +41,17 @@ class GoogleGemini {
     GeminiResponse response =
         GeminiResponse(text: text, response: httpResponse);
     return response;
+  }
+
+  Stream<String> generateFromTextStream(String query,
+      {bool isFinalGenerate = false}) async* {
+    yield* apiStreamGenerateText(
+        query: query,
+        apiKey: apiKey,
+        config: config,
+        safetySettings: safetySettings,
+        model: "gemini-2.5-flash",
+        isFinalGenerate: isFinalGenerate);
   }
 
   Future<GeminiResponse> generateFromTextAndImages(

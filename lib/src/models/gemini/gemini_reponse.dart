@@ -2,7 +2,7 @@
 /// This class is used to create a instance of a candidate
 class GeminiHttpResponseCandidate {
   final String? finishReason;
-  final int index;
+  final int? index;
   Map<String, dynamic>? content = {"parts": [], "role": "model"};
   final List safetyRatings;
 
@@ -18,7 +18,8 @@ class GeminiHttpResponseCandidate {
         finishReason: json['finishReason'],
         index: json['index'],
         content: json['content'],
-        safetyRatings: json['safetyRatings']);
+        safetyRatings:
+            json.containsKey('safetyRatings') ? json['safetyRatings'] : []);
   }
 
   /// Convert a GeminiHttpResponseCandidate to a json
